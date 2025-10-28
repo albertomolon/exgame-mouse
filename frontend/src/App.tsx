@@ -1,13 +1,14 @@
 import { Link, Route, Routes } from "react-router";
 import styles from "./App.module.css";
 import Logo from "./assets/ExGame logo.svg";
-import { MySubscriptions } from "./pages/student/mySubscriptions";
-import { Subscription } from "./pages/Subscription";
-import Login from "./components/Login/login";
-import Logout from "./components/Logout/logout";
+import { Authenticated } from "./components/authentication/Authenticated";
 import { AuthenticationProvider } from "./components/authentication/AuthenticationProvider";
 import { CurrentUser } from "./components/CurrentUser/CurrentUser";
-import { Authenticated } from "./components/authentication/Authenticated";
+import Login from "./components/Login/login";
+import Logout from "./components/Logout/logout";
+import { SocketIoRoute } from "./pages/SocketIoRoute";
+import { MySubscriptions } from "./pages/student/mySubscriptions";
+import { Subscription } from "./pages/Subscription";
 
 function App() {
   return (
@@ -45,10 +46,12 @@ function App() {
           <Routes>
             <Route element={<Authenticated />}>
               <Route index element={<MySubscriptions />} />
-              <Route
-                path="subscriptions/:subcriptionId"
-                element={<Subscription />}
-              />
+              <Route element={<SocketIoRoute />}>
+                <Route
+                  path="subscriptions/:subcriptionId"
+                  element={<Subscription />}
+                />
+              </Route>
             </Route>
             <Route path="/login" element={<Login />} />
             <Route path="/logout" />
@@ -58,6 +61,5 @@ function App() {
     </AuthenticationProvider>
   );
 }
-// va fatta la route e il websocket
-export default App;
 
+export default App;

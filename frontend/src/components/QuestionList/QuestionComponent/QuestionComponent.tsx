@@ -5,15 +5,17 @@ export type QuestionComponentProp = {
   question: QuestionType;
   response: string;
   setResponse: (value: string) => void;
+  shake?: boolean;
 };
 
 const QuestionComponent = ({
   question,
   response,
   setResponse,
+  shake = false,
 }: QuestionComponentProp) => {
   return (
-    <fieldset className={styles.form}>
+    <fieldset className={`${styles.form} ${shake ? styles.shake : ""}`}>
       <h3 className={styles.question}>{question.text} ? </h3>
       {question?.answers?.map((answer) => (
         <label key={answer._id}>

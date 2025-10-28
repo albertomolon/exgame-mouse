@@ -61,7 +61,7 @@ export const initSocketIo = (httpServer: http.Server) => {
       user.currentSubscriptionId = subscriptionId;
     });
 
-    socket.on("disturb", () => { // evento generato dal client per disturbare gli altri
+    socket.on("disturb", () => {
       registerAction("disturb");
       socket.broadcast.emit("disturb", { from: user.name });
     });
@@ -74,9 +74,9 @@ export const initSocketIo = (httpServer: http.Server) => {
       }
 
       // Trovo un utente a caso che ha dati salvati per questa sottoscrizione (diverso dall'utente corrente)
-      const usersWithData = users 
+      const usersWithData = users
         .filter(u => u.id !== user.id)
-        .filter(u => u.data[user.currentSubscriptionId!]);  //filtro tutti quelli che sono nel mio stesso esame e hanno dati salvati
+        .filter(u => u.data[user.currentSubscriptionId!]);
 
       // Se non ci sono utenti con dati, esco
       if (usersWithData.length === 0) {
@@ -106,10 +106,8 @@ export const initSocketIo = (httpServer: http.Server) => {
         return;
       }
 
-      user.data[user.currentSubscriptionId] = responses; // salvo le risposte per la sottoscrizione corrente
-      console.log('users', JSON.stringify(users, null, 2)); // debug puramente visivo per vedere i dati salvati
+      user.data[user.currentSubscriptionId] = responses;
+      console.log('users', JSON.stringify(users, null, 2));
     });
   })
 }
-
-//SERVER SOCKET.IO
