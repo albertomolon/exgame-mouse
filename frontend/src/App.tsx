@@ -58,5 +58,5 @@ function App() {
     </AuthenticationProvider>
   );
 }
-
+// va fatta la route e il websocket
 export default App;
