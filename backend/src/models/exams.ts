@@ -31,9 +31,9 @@ const examSchema = new mongoose.Schema<IExam>({
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
     created_by: { type: String, required: true },
-    schedule_date: { type: Date, required: true }, 
-    max_time: { type: Number, required: true }, 
-    questions: { type: [Object], default: [] }, 
+    schedule_date: { type: Date, required: true },
+    max_time: { type: Number, required: true },
+    questions: { type: [Object], default: [] },
 });
 
 export const examModel = mongoose.model<IExam>("Exam", examSchema);
