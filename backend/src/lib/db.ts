@@ -3,14 +3,6 @@ import mongoose from "mongoose";
 
 mongoose.connect(config.DB_URL);
 
-interface ICat {
-  name: string;
-  age: number;
+export const dbClient = () => {
+    return mongoose;
 }
-
-const catSchema = new mongoose.Schema({
-  name: String,
-  age: Number,
-});
-
-const catModel = mongoose.model<ICat>("Cat", catSchema);
