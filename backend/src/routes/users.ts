@@ -1,5 +1,7 @@
 import Router from "@koa/router";
 import UsersDAO from "../dao/users.dao";
+import userModel from "../models/users";
+import { validateUserRegistration, hashPassword } from "../models/users";
 
 const router = new Router({
   prefix: "/api/users",
@@ -18,20 +20,40 @@ router.get("/",  async (ctx) => {
   }
 });
 
-router.post("/", async (ctx) => {
-  try{
-    const newUser = await usersDAO.create(ctx.request.body);
-    if(!newUser || !newUser.id){
-      ctx.status = 400;
-      ctx.body = { error: "400 Bad Request" };
-      return;
+router.post(
+  "/",
+  validateUserRegistration,
+  hashPassword,
+  async (ctx) => {
+    try {
+      const { email, password } = ctx.request.body as {
+        email: string;
+        password: string;
+      };
+
+      // Verifica se l'utente esiste già
+      const existingUser = await userModel.findOne({ email });
+      if (existingUser) {
+        ctx.status = 409;
+        ctx.body = { error: "User already exists" };
+        return;
+      }
+
+      // Creazione e salvataggio nuovo utente
+      const newUser = new userModel({
+        email,
+        password, // password già hashata
+      });
+
+      await newUser.save();
+
+      ctx.status = 201;
+      ctx.body = { message: "User created successfully" };
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: "Internal Server Error" };
     }
-    ctx.status = 201;
-    ctx.body = newUser;
-  } catch (error) {
-    ctx.status = 500;
-    ctx.body = { error: "Internal Server Error" };
   }
-});
+);
 
 export default router;

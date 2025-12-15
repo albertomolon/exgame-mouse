@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import Joi from "joi";
+import bcrypt from "bcrypt";
+import { Context, Next } from "koa";
 
 export interface Iuser {
   id: string;
@@ -25,6 +28,39 @@ const userSchema = new mongoose.Schema<Iuser>({
   role: { type: String, enum: ["user", "teacher", "admin"], default: "user" },
   data: { type: mongoose.Schema.Types.Mixed, required: false },
 });
+
+// Middleware 1: Validazione dati utente
+export const validateUserRegistration = async (ctx: Context, next: Next) => {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string()
+      .min(8)
+      .pattern(/[!@#$%^&*(),.?":{}|<>]/)
+      .required(),
+  });
+
+  const { error } = schema.validate(ctx.request.body);
+
+  if (error) {
+    ctx.status = 400;
+    ctx.body = { message: "Validation error", details: error.details };
+    return;
+  }
+
+  await next();
+};
+
+// Middleware 2: Hash password
+export const hashPassword = async (ctx: Context, next: Next) => {
+  const { password } = ctx.request.body as { password: string };
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  ctx.request.body.password = hashedPassword;
+
+  await next();
+};
 
 const userModel = mongoose.model<Iuser>("User", userSchema);
 
