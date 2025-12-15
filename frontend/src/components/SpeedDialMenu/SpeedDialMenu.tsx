@@ -5,16 +5,21 @@ import { SocketIoContext } from '../socketio/SocketIoContext';
 import { SpeedDialItem } from './SpeedDialItem';
 import styles from './SpeedDialMenu.module.css';
 
+interface ChatVisibilityContextType {
+  isVisible: boolean;
+  setIsVisible: (value: boolean) => void;
+}
+
 export const SpeedDialMenu = () => {
   const [open, setOpen] = useState(false);
   const socketIoContext = useContext(SocketIoContext);
-  const { setIsVisible } = useContext(ChatVisibilityContext);
+  const { setIsVisible } = useContext(ChatVisibilityContext) as ChatVisibilityContextType;
 
   const handleToggle = () => setOpen(!open);
 
   const handleActionClick = (actionName: string) => {
     console.log(`Azione selezionata: ${actionName}`);
-    socketIoContext.socket?.emit(actionName);
+    socketIoContext?.socket?.emit(actionName);
     setOpen(false);
   };
 
@@ -23,7 +28,7 @@ export const SpeedDialMenu = () => {
     setIsVisible(true);
   }
 
-  if (!socketIoContext.connected) {
+  if (!socketIoContext?.connected) {
     return null;
   }
 
@@ -34,15 +39,18 @@ export const SpeedDialMenu = () => {
           <SpeedDialItem
             icon={<IconBellRinging />}
             label="Disturba"
-            onClick={() => handleActionClick('disturb')} />
+            onClick={() => handleActionClick('disturb')}
+          />
           <SpeedDialItem
             icon={<IconClipboardCheck />}
             label="Copia"
-            onClick={() => handleActionClick('copy')} />
+            onClick={() => handleActionClick('copy')}
+          />
           <SpeedDialItem
             icon={<IconQuestionMark />}
             label="Chiedi aiuto"
-            onClick={() => handleActionAsk()} />
+            onClick={handleActionAsk}
+          />
         </div>
       )}
       <button

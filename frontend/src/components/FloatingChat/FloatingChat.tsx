@@ -3,10 +3,16 @@ import { SocketIoContext } from "../socketio/SocketIoContext";
 import { ChatVisibilityContext } from "./ChatVisibility";
 import styles from "./FloatingChat.module.css";
 
+// Assicurati che ChatVisibilityContext abbia queste proprietà
+interface ChatVisibilityContextType {
+  isVisible: boolean;
+  setIsVisible: (value: boolean) => void;
+}
+
 const FloatingChat = () => {
-  const { isVisible, setIsVisible } = useContext(ChatVisibilityContext);
+  const { isVisible, setIsVisible } = useContext(ChatVisibilityContext) as ChatVisibilityContextType;
   const socketIoContext = useContext(SocketIoContext);
-  const socket = socketIoContext.socket;
+  const socket = socketIoContext?.socket;
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState<{ from?: string; text: string }[]>([]);
 
@@ -16,14 +22,14 @@ const FloatingChat = () => {
 
   const invia = () => {
     console.log("Messaggio inviato:", message);
-    setMessage("");
     socket?.emit("chatMessage", message);
+    setMessage("");
   }
 
   useEffect(() => {
     socket?.on("chatMessageList", (messages: { from?: string; text: string }[]) => {
       setMessageList(messages);
-    })
+    });
 
     return () => {
       socket?.off("chatMessageList");
@@ -54,7 +60,7 @@ const FloatingChat = () => {
             type="text"
             placeholder="Scrivi un messaggio..."
             value={message}
-            onChange={(event) => { setMessage(event.target.value); }}
+            onChange={(event) => setMessage(event.target.value)}
           />
           <button onClick={invia}>Invia</button>
         </div>

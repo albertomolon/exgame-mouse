@@ -24,6 +24,32 @@ services:
         mongo|MongoDB|mongodb://db:27017|mydatabase # Connessione automatica al DB Mongo
     restart: unless-stopped # Riavvia automaticamente se viene interrotto
 
+  # --- Servizio Backend ---
+  backend:
+    build: ./backend # Costruisce l’immagine dal Dockerfile nella cartella backend
+    container_name: backend_service # Nome del container
+    ports:
+      - "3000:3000" # Espone la porta 3000 del container sulla 3000 dell’host
+    depends_on:
+      - db # Garantisce che MongoDB parta prima del backend
+    environment:
+      FRONTEND_APP: http://localhost:5173
+      APP_HOST: 0.0.0.0
+      APP_PORT: 3000
+      MONGODB_URI: mongodb://db:27017/db_exgame_mouse
+    restart: unless-stopped # Riavvia automaticamente se viene interrotto
+
+  # --- Servizio Frontend ---
+  frontend:
+    build: ./frontend # Costruisce l’immagine dal Dockerfile nella cartella frontend
+    container_name: frontend_service # Nome del container
+    ports:
+      - "5173:5173" # Espone la porta 5173 del container sulla 5173 dell’host
+    depends_on:
+      - backend # Garantisce che il backend parta prima del frontend
+    restart: unless-stopped # Riavvia automaticamente se viene interrotto
+    
+
 # --- Volumi persistenti ---
 volumes:
   mongo_data: # Crea un volume Docker per salvare i dati
