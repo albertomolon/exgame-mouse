@@ -6,7 +6,6 @@ import { Context, Next } from "koa";
 export const validateRegistration = async (ctx: Context, next: Next) => {
 
   const schema = Joi.object({
-    id: Joi.string().required(),
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
     email: Joi.string().email().required(),
@@ -33,10 +32,13 @@ export const hashPassword = async (ctx: Context, next: Next) => {
 
 export const generateJWT = async (ctx: Context, next: Next) => {
   const { email } = ctx.request.body;
-  const token = jwt.sign({ email }, process.env.JWT_SECRET as string, {
-    expiresIn: "30m",
-  });
-  ctx.request.body.token = token;
 
+  const token = jwt.sign(
+    { email },
+    process.env.JWT_SECRET as string,
+    { expiresIn: "30m" }
+  );
+
+  ctx.state.token = token;
   await next();
 };

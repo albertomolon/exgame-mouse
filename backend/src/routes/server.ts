@@ -1,4 +1,5 @@
 import Router from "@koa/router";
+import "dotenv/config";
 
 const router = new Router({
   prefix: "/server",

@@ -53,27 +53,38 @@ router.post(
   },
 );
 
-router.post("/login", generateJWT, async (ctx) => {
+router.post("/login", async (ctx, next) => {
   try {
     const { email, password } = ctx.request.body;
+
+    // 1. Verifica esistenza utente
     const existingUser = await usersDAO.getByEmail(email);
     if (!existingUser) {
       ctx.status = 401;
       ctx.body = { error: "Invalid email or password" };
       return;
     }
+
+    // 2. Confronto password
     const passwordMatch = await bcrypt.compare(password, existingUser.password);
     if (!passwordMatch) {
       ctx.status = 401;
       ctx.body = { error: "Invalid email or password" };
       return;
     }
-    ctx.status = 200;
-    ctx.body = { message: "Login successful", token: ctx.request.body.token };
+
+    // Passa al middleware JWT
+    await next();
   } catch (error) {
     ctx.status = 500;
     ctx.body = { error: "Internal Server Error" };
   }
+}, generateJWT, async (ctx) => {
+  ctx.status = 200;
+  ctx.body = {
+    message: "Login successful",
+    token: ctx.state.token,
+  };
 });
 
 export default router;
